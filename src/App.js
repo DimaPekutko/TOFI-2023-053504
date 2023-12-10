@@ -44,7 +44,8 @@ const App = observer(() => {
     <div className="App">
       <Router>
         <Container maxW='8xl' bgGradient='linear(to-br, gray.200, blue.100, green.100)' minH='100vh'>
-          {process.env.API_URL}
+          hello
+          {process.env.REACT_APP_API_URL}
           <VStack>
             <Flex as={'nav'} w={'100%'} alignItems={'center'}>
               <Heading>Bank</Heading>
