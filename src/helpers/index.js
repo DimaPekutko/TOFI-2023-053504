@@ -1,6 +1,6 @@
 import { isArray } from "lodash";
 
-const API_URL = 'http://localhost:8001/api/'
+const API_URL = process.env.API_URL; // 'http://localhost:8001/api/'
 
 const methods = {
   GET: 'GET',
