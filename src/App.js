@@ -43,10 +43,10 @@ const App = observer(() => {
   return (
     <div className="App">
       <Router>
-        <Container maxW='8xl' bgGradient='linear(to-br, gray.200, blue.100, green.100)' minH='100vh'>
+        <Container maxW='8xl' bgGradient='linear(to-b, blue.100, blue.200, blue.300)' minH='100vh'>
           <VStack>
             <Flex as={'nav'} w={'100%'} alignItems={'center'}>
-              <Heading>Bank</Heading>
+              <Heading>Bank12</Heading>
               <Spacer/>
               <HStack>
                 {authStore.isLogged ? (

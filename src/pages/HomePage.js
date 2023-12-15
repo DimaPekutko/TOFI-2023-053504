@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { authStore } from "../store/authStore";
 import { Container, VStack, Text, Divider, Heading, HStack, Spacer, FormControl, Input, Button, ListItem, OrderedList, FormErrorMessage, Tabs, Tab, TabList, TabPanel, TabPanels, Flex, Center } from "@chakra-ui/react";
 import { transactionStore } from "../store/transactionStore";
@@ -7,6 +7,12 @@ import { AddIcon, ArrowForwardIcon, CheckIcon, DownloadIcon, RepeatClockIcon } f
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import StatReport from "../pdf/StatReport";
 
+
+const CREDIT_PERCENTS = {
+  6: 20,
+  12: 18,
+  18: 12
+}
 
 
 const TransactionSection = observer(() => {
@@ -95,6 +101,7 @@ const CreditSection = observer(() => {
 
   const [createErr, setCreateErr] = useState('');
   const [amountPerMonth, setAmountPerMonth] = useState(0);
+  const [percent, setPercent] = useState(CREDIT_PERCENTS[6]);
   const formRef = useRef();
 
   
@@ -108,18 +115,20 @@ const CreditSection = observer(() => {
     const data = {
       amount: form.get('amount'),
       months: form.get('months'),
-      percent: 12,
+      percent: percent,
     }
     return data;
   }
 
-  const calculatePerMonth = (amount, months) => Number(amount / months).toFixed(4)
+  const calculatePerMonth = (amount, months, percent) => Number((amount / months) * (1 + percent / 100)).toFixed(4)
 
   const updateAmountPerMonth = () => {
     const data = getFormData();
     
     if (data.months) {
-      setAmountPerMonth(calculatePerMonth(data.amount, data.months));
+      const p = CREDIT_PERCENTS[data.months - data.months % 6] ?? CREDIT_PERCENTS[6];
+      setPercent(p)
+      setAmountPerMonth(calculatePerMonth(data.amount, data.months, p));
     }
   }
 
@@ -162,7 +171,7 @@ const CreditSection = observer(() => {
             <HStack px={5} borderRadius={5}>
               <Text display='flex' gap={2}>
                 Request <Text color='green.500'>{cr.amount} $</Text> for {cr.months} months,
-                <Text color='pink.500'>{calculatePerMonth(cr.amount, cr.months)} $</Text> / month
+                <Text color='pink.500'>{calculatePerMonth(cr.amount, cr.months, cr.percent)} $</Text> / month ({cr.percent}%)
               </Text>
               <Spacer />
               {getIcon(cr)}
@@ -176,7 +185,7 @@ const CreditSection = observer(() => {
             <VStack alignItems={'left'} px={10}>
               <Text>Request a credit with sum</Text>
               <Input type="number" min="200.0" name="amount" placeholder="Amount" />
-              <Text>via 12% per month for</Text>
+              <Text>via {percent}% per month for</Text>
               <Input type="number" min="1" max="36" name="months" placeholder="Months" />
               <Text>will be {amountPerMonth} $ per month.</Text>
               <FormErrorMessage>{createErr}</FormErrorMessage>
